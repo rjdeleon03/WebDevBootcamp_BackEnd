@@ -1,4 +1,5 @@
 var express = require("express"),
+    expressSanitizer = require("express-sanitizer"),
     methodOverride = require("method-override"),
     bodyParser = require("body-parser"),
     mongoose = require("mongoose"),
@@ -10,6 +11,7 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(methodOverride("_method"));
+app.use(expressSanitizer()); // must be after bodyParser ALWAYS
 
 // MONGOOSE/MODEL CONFIG
 var blogSchema = new mongoose.Schema({
@@ -44,6 +46,7 @@ app.get("/blogs/new", function(req, res) {
 // CREATE ROUTE
 app.post("/blogs", function(req, res) {
     // Create blog
+    req.body.blog.body = req.sanitize(req.body.blog.body);
     Blog.create(req.body.blog, function(err, newBlog) {
         if (err) {
             res.render("new");
