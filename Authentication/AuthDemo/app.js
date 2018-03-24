@@ -44,7 +44,8 @@ app.get("/", function(req, res) {
 });
 
 // SECRET ROUTE
-app.get("/secret", function(req, res) {
+// Middleware checks if user is logged in
+app.get("/secret", isLoggedIn, function(req, res) {
     res.render("secret");
 });
 
@@ -84,6 +85,20 @@ app.post("/login",
         failureRedirect: "/login"
     }), 
     function(req, res) {});
+
+// LOGOUT ROUTE
+app.get("/logout", function(req, res) {
+    req.logout();
+    res.redirect("/");
+});
+
+// Check if user is logged in
+function isLoggedIn(req, res, next) {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    res.redirect("/register");
+}
 
 // LISTEN TO PORT 3000
 app.listen(3000, function() {
